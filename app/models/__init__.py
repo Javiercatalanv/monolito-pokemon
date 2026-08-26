@@ -1,3 +1,8 @@
-from app.models.item import Item
+"""
+Modelos SQLAlchemy del dominio.
 
-__all__ = ["Item"]
+Importarlos aqui es lo que hace que queden registrados en `Base.metadata`,
+que es de donde Alembic lee el esquema para autogenerar las migraciones.
+"""
+
+__all__: list[str] = []

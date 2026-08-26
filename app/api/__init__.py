@@ -1,3 +1,1 @@
-from app.api.v1.router import api_router
-
-__all__ = ["api_router"]
+"""Capa de exposicion HTTP, versionada por subpaquete."""

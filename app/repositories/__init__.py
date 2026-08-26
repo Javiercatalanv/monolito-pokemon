@@ -1,3 +1,1 @@
-from app.repositories.item_repository import ItemRepository
-
-__all__ = ["ItemRepository"]
+"""Capa de acceso a datos: consultas SQLAlchemy aisladas de la logica de negocio."""

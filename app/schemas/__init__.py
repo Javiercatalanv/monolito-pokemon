@@ -1,4 +1,5 @@
-from app.schemas.health import HealthResponse
-from app.schemas.item import ItemBase, ItemCreate, ItemResponse, ItemUpdate
+"""DTOs de entrada y salida de la API (Pydantic v2)."""
 
-__all__ = ["ItemBase", "ItemCreate", "ItemUpdate", "ItemResponse", "HealthResponse"]
+from app.schemas.health import HealthResponse
+
+__all__ = ["HealthResponse"]

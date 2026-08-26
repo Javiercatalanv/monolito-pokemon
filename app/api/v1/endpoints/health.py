@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import UTC, datetime
 
 from fastapi import APIRouter
 
@@ -17,6 +17,6 @@ def check_health():
     return HealthResponse(
         status="online",
         app_name=settings.PROJECT_NAME,
-        version="1.0.0",
-        timestamp=datetime.utcnow(),
+        version=settings.VERSION,
+        timestamp=datetime.now(UTC),
     )

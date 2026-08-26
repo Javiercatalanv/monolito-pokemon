@@ -33,7 +33,7 @@ app = FastAPI(
     * **Validación de datos**: Pydantic v2.
     * **CORS Habilitado**: Comunicación directa con Angular en localhost:4200.
     """,
-    version="1.0.0",
+    version=settings.VERSION,
     lifespan=lifespan,
 )
 

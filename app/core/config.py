@@ -7,6 +7,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     PROJECT_NAME: str = "Proyecto Monolito - Arquitectura de Sistemas"
     API_V1_STR: str = "/api/v1"
+    VERSION: str = "0.1.0"
 
     # CORS Origins permitidos
     BACKEND_CORS_ORIGINS: list[str] = [

@@ -1,0 +1,33 @@
+# Infraestructura local del proyecto.
+# Solo levanta la base de datos: el backend y el frontend se corren a mano
+# durante el desarrollo (el despliegue en contenedores no es requisito).
+#
+#   docker compose up -d postgres
+#
+# El puerto del host se puede sobrescribir con POSTGRES_PORT si 5434 esta
+# ocupado por otro proyecto:  POSTGRES_PORT=5555 docker compose up -d postgres
+#   docker compose down          # conserva los datos
+#   docker compose down -v       # borra el volumen y parte de cero
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: pokemon-counter-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: pokemon
+      POSTGRES_PASSWORD: pokemon
+      POSTGRES_DB: pokemon_counter
+    ports:
+      - "${POSTGRES_PORT:-5434}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pokemon -d pokemon_counter"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+volumes:
+  pgdata:

@@ -37,6 +37,30 @@ jobs:
   tests:
     name: Tests
     runs-on: ubuntu-latest
+
+    # Los tests corren contra un PostgreSQL real, no contra SQLite: es el mismo
+    # motor que usa el proyecto y evita que una diferencia de dialecto aparezca
+    # recien en produccion.
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: pokemon
+          POSTGRES_PASSWORD: pokemon
+          POSTGRES_DB: pokemon_counter
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U pokemon -d pokemon_counter"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      # Dentro del runner el servicio se expone en el 5432 estandar, no en el
+      # 5434 que usa docker-compose para no chocar con otros proyectos locales.
+      DATABASE_URL: postgresql+psycopg://pokemon:pokemon@localhost:5432/pokemon_counter
+
     steps:
       - uses: actions/checkout@v4
 

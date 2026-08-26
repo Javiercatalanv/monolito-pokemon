@@ -1,0 +1,63 @@
+[project]
+name = "pokemon-counter-backend"
+version = "0.1.0"
+description = "Backend FastAPI del Pokemon Counter Team Builder"
+requires-python = ">=3.12"
+
+# ---------------------------------------------------------------------------
+# Ruff - linter
+# ---------------------------------------------------------------------------
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["app", "tests"]
+exclude = ["venv", ".venv", "alembic/versions"]
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle
+    "F",   # pyflakes
+    "I",   # isort
+    "B",   # flake8-bugbear
+    "UP",  # pyupgrade
+    "C4",  # flake8-comprehensions
+]
+# B008: FastAPI usa Depends()/Query() como valor por defecto, es idiomatico.
+ignore = ["B008"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["app"]
+
+# ---------------------------------------------------------------------------
+# Black - formateador
+# ---------------------------------------------------------------------------
+[tool.black]
+line-length = 100
+target-version = ["py312"]
+extend-exclude = "/(venv|\\.venv)/"
+
+# ---------------------------------------------------------------------------
+# Pytest
+# ---------------------------------------------------------------------------
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q --strict-markers"
+pythonpath = ["."]
+
+# ---------------------------------------------------------------------------
+# Coverage
+# ---------------------------------------------------------------------------
+[tool.coverage.run]
+source = ["app"]
+omit = [
+    "app/core/build_dataset.py",  # script ETL puntual, no forma parte del runtime
+    "*/__init__.py",
+]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = false
+exclude_lines = [
+    "pragma: no cover",
+    "if __name__ == .__main__.:",
+]

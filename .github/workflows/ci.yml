@@ -75,6 +75,18 @@ jobs:
       - name: Instalar dependencias
         run: pip install -r requirements.txt -r requirements-dev.txt
 
+      - name: Aplicar migraciones
+        run: alembic upgrade head
+
+      - name: Verificar que no hay drift entre modelos y esquema
+        # Falla si alguien cambio un modelo sin generar la migracion.
+        run: alembic check
+
+      - name: Verificar que el downgrade revierte el esquema
+        run: |
+          alembic downgrade base
+          alembic upgrade head
+
       - name: Pytest con cobertura
         run: pytest --cov --cov-report=term-missing --cov-report=xml
 

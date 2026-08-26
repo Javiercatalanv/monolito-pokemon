@@ -1,10 +1,10 @@
-from typing import List, Optional, Dict, Any
+from typing import Any
+
 from pydantic import BaseModel, Field
-from app.schemas.pokemon import PokemonSummary
 
 
 class CounterRequest(BaseModel):
-    opponent_pokemon_ids: List[int] = Field(..., min_length=1, max_length=6)
+    opponent_pokemon_ids: list[int] = Field(..., min_length=1, max_length=6)
     strategy: str = "balanced"  # 'balanced', 'offensive', 'defensive'
     include_legendaries: bool = True
 
@@ -20,13 +20,13 @@ class CounterMember(BaseModel):
     rank: int
     id: int
     name: str
-    types: List[str]
-    stats: Dict[str, int]
+    types: list[str]
+    stats: dict[str, int]
     sprite: str
     artwork: str
     score: float
     role: str
-    targets_countered: List[TargetCountered]
+    targets_countered: list[TargetCountered]
 
 
 class TeamWeakness(BaseModel):
@@ -37,13 +37,13 @@ class TeamWeakness(BaseModel):
 
 class OpponentAnalysis(BaseModel):
     team_size: int
-    pokemon: List[Dict[str, Any]]
-    top_team_weaknesses: List[TeamWeakness]
-    top_offensive_threats: List[TeamWeakness]
+    pokemon: list[dict[str, Any]]
+    top_team_weaknesses: list[TeamWeakness]
+    top_offensive_threats: list[TeamWeakness]
 
 
 class CounterResponse(BaseModel):
     strategy: str
     team_coverage_percentage: float
     opponent_analysis: OpponentAnalysis
-    counter_team: List[CounterMember]
+    counter_team: list[CounterMember]

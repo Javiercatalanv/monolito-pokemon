@@ -1,12 +1,13 @@
 from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 
-from app.core.config import settings
-from app.core.database import engine, Base
 import app.models  # Importa modelos para que SQLAlchemy los reconozca
 from app.api.v1.router import api_router
+from app.core.config import settings
+from app.core.database import Base, engine
 
 
 @asynccontextmanager
@@ -23,7 +24,8 @@ app = FastAPI(
     redoc_url="/redoc",
     description="""
     ## Arquitectura Monolitica - API REST Backend
-    Este backend provee servicios REST construidos con FastAPI y SQLAlchemy para el frontend en Angular.
+    Este backend provee servicios REST construidos con FastAPI y SQLAlchemy
+    para el frontend en Angular.
     
     ### Funcionalidades:
     * **Arquitectura por capas**: Repositorios, Servicios, Esquemas y Controladores (Endpoints).
@@ -32,7 +34,7 @@ app = FastAPI(
     * **CORS Habilitado**: Comunicación directa con Angular en localhost:4200.
     """,
     version="1.0.0",
-    lifespan=lifespan
+    lifespan=lifespan,
 )
 
 # Configuracion de CORS para comunicacion con Angular

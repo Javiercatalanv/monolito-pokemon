@@ -1,19 +1,25 @@
-from typing import List, Dict, Any, Optional
-from app.core.type_chart import get_attack_multiplier, get_defensive_profile, POKEMON_TYPES, TYPE_COLORS
+from typing import Any
+
 from app.core.pokemon_repository import pokemon_repo
+from app.core.type_chart import (
+    POKEMON_TYPES,
+    TYPE_COLORS,
+    get_attack_multiplier,
+    get_defensive_profile,
+)
 
 
 class CounterEngine:
-    def analyze_team(self, team_pokemon: List[Dict[str, Any]]) -> Dict[str, Any]:
+    def analyze_team(self, team_pokemon: list[dict[str, Any]]) -> dict[str, Any]:
         """
         Analyze an opponent team's type weaknesses, resistances, and offensive threats.
         """
         if not team_pokemon:
             return {"error": "Team is empty"}
 
-        type_weakness_counts: Dict[str, int] = {t: 0 for t in POKEMON_TYPES}
-        type_resistance_counts: Dict[str, int] = {t: 0 for t in POKEMON_TYPES}
-        offensive_stabs: Dict[str, int] = {t: 0 for t in POKEMON_TYPES}
+        type_weakness_counts: dict[str, int] = dict.fromkeys(POKEMON_TYPES, 0)
+        type_resistance_counts: dict[str, int] = dict.fromkeys(POKEMON_TYPES, 0)
+        offensive_stabs: dict[str, int] = dict.fromkeys(POKEMON_TYPES, 0)
 
         pokemon_summaries = []
 
@@ -39,44 +45,54 @@ class CounterEngine:
             for st in p_types:
                 offensive_stabs[st] = offensive_stabs.get(st, 0) + 1
 
-            pokemon_summaries.append({
-                "id": p["id"],
-                "name": p["name"],
-                "types": p_types,
-                "sprite": p["sprite"],
-                "artwork": p["artwork"],
-                "weak_to": sorted(weak_to, key=lambda x: x["multiplier"], reverse=True),
-                "resists": resists,
-                "immune_to": immune_to
-            })
+            pokemon_summaries.append(
+                {
+                    "id": p["id"],
+                    "name": p["name"],
+                    "types": p_types,
+                    "sprite": p["sprite"],
+                    "artwork": p["artwork"],
+                    "weak_to": sorted(weak_to, key=lambda x: x["multiplier"], reverse=True),
+                    "resists": resists,
+                    "immune_to": immune_to,
+                }
+            )
 
         # Top team weaknesses (types that hit 2+ members super effectively)
         sorted_weaknesses = sorted(
-            [{"type": t, "count": c, "color": TYPE_COLORS.get(t, "#888")} for t, c in type_weakness_counts.items() if c > 0],
+            [
+                {"type": t, "count": c, "color": TYPE_COLORS.get(t, "#888")}
+                for t, c in type_weakness_counts.items()
+                if c > 0
+            ],
             key=lambda x: x["count"],
-            reverse=True
+            reverse=True,
         )
 
         # Top offensive threats from opponent
         sorted_threats = sorted(
-            [{"type": t, "count": c, "color": TYPE_COLORS.get(t, "#888")} for t, c in offensive_stabs.items() if c > 0],
+            [
+                {"type": t, "count": c, "color": TYPE_COLORS.get(t, "#888")}
+                for t, c in offensive_stabs.items()
+                if c > 0
+            ],
             key=lambda x: x["count"],
-            reverse=True
+            reverse=True,
         )
 
         return {
             "team_size": len(team_pokemon),
             "pokemon": pokemon_summaries,
             "top_team_weaknesses": sorted_weaknesses,
-            "top_offensive_threats": sorted_threats
+            "top_offensive_threats": sorted_threats,
         }
 
     def generate_counter_team(
         self,
-        opponent_team: List[Dict[str, Any]],
+        opponent_team: list[dict[str, Any]],
         strategy: str = "balanced",
-        include_legendaries: bool = True
-    ) -> Dict[str, Any]:
+        include_legendaries: bool = True,
+    ) -> dict[str, Any]:
         """
         Generates an optimal 6-Pokémon counter team against the given opponent team.
         Strategies: 'balanced', 'offensive', 'defensive'
@@ -144,12 +160,14 @@ class CounterEngine:
                 # Strategy modifiers
                 if strategy == "offensive":
                     offensive_power = max(cand_stats["attack"], cand_stats["sp_attack"])
-                    matchup_score += (offensive_power / 10.0)
+                    matchup_score += offensive_power / 10.0
                     if max_offensive_mult >= 2.0:
                         matchup_score += 25.0
                 elif strategy == "defensive":
-                    bulk = (cand_stats["hp"] + cand_stats["defense"] + cand_stats["sp_defense"]) / 3.0
-                    matchup_score += (bulk / 10.0)
+                    bulk = (
+                        cand_stats["hp"] + cand_stats["defense"] + cand_stats["sp_defense"]
+                    ) / 3.0
+                    matchup_score += bulk / 10.0
                     if max_incoming_mult <= 0.5:
                         matchup_score += 25.0
 
@@ -168,23 +186,31 @@ class CounterEngine:
                     elif max_incoming_mult <= 0.5:
                         reason.append("Resiste ataques del rival")
 
-                    targets_countered.append({
-                        "opponent_id": opp["id"],
-                        "opponent_name": opp["name"],
-                        "advantage_type": "Hard Counter" if (max_offensive_mult >= 2.0 and max_incoming_mult <= 0.5) else "Advantage",
-                        "notes": " & ".join(reason) if reason else "Ventaja de Stats/Tipo"
-                    })
+                    targets_countered.append(
+                        {
+                            "opponent_id": opp["id"],
+                            "opponent_name": opp["name"],
+                            "advantage_type": (
+                                "Hard Counter"
+                                if (max_offensive_mult >= 2.0 and max_incoming_mult <= 0.5)
+                                else "Advantage"
+                            ),
+                            "notes": " & ".join(reason) if reason else "Ventaja de Stats/Tipo",
+                        }
+                    )
 
             # Base Stat Total baseline bonus
             bst_bonus = (cand_stats["bst"] - 430) * 0.1
             final_score = total_score + bst_bonus
 
-            scored_candidates.append({
-                "pokemon": cand,
-                "score": round(final_score, 1),
-                "targets_countered": targets_countered,
-                "counter_count": len(targets_countered)
-            })
+            scored_candidates.append(
+                {
+                    "pokemon": cand,
+                    "score": round(final_score, 1),
+                    "targets_countered": targets_countered,
+                    "counter_count": len(targets_countered),
+                }
+            )
 
         # Sort candidates by score
         scored_candidates.sort(key=lambda x: (x["counter_count"], x["score"]), reverse=True)
@@ -204,7 +230,9 @@ class CounterEngine:
             # Promote type diversity in the counter team
             if primary_type in seen_primary_types and len(selected_team) < 5:
                 # Allow only if it counters an uncovered opponent
-                new_counters = {t["opponent_id"] for t in cand_data["targets_countered"]} - covered_opponents
+                new_counters = {
+                    t["opponent_id"] for t in cand_data["targets_countered"]
+                } - covered_opponents
                 if not new_counters and len(selected_team) < 4:
                     continue
 
@@ -217,29 +245,33 @@ class CounterEngine:
         counter_members = []
         for rank, item in enumerate(selected_team, 1):
             p = item["pokemon"]
-            counter_members.append({
-                "rank": rank,
-                "id": p["id"],
-                "name": p["name"],
-                "types": p["types"],
-                "stats": p["stats"],
-                "sprite": p["sprite"],
-                "artwork": p["artwork"],
-                "score": item["score"],
-                "targets_countered": item["targets_countered"],
-                "role": self._determine_role(p, strategy)
-            })
+            counter_members.append(
+                {
+                    "rank": rank,
+                    "id": p["id"],
+                    "name": p["name"],
+                    "types": p["types"],
+                    "stats": p["stats"],
+                    "sprite": p["sprite"],
+                    "artwork": p["artwork"],
+                    "score": item["score"],
+                    "targets_countered": item["targets_countered"],
+                    "role": self._determine_role(p, strategy),
+                }
+            )
 
         analysis = self.analyze_team(opponent_team)
 
         return {
             "strategy": strategy,
-            "team_coverage_percentage": round(min(100.0, (len(covered_opponents) / max(1, len(opponent_team))) * 100), 1),
+            "team_coverage_percentage": round(
+                min(100.0, (len(covered_opponents) / max(1, len(opponent_team))) * 100), 1
+            ),
             "opponent_analysis": analysis,
-            "counter_team": counter_members
+            "counter_team": counter_members,
         }
 
-    def _determine_role(self, pokemon: Dict[str, Any], strategy: str) -> str:
+    def _determine_role(self, pokemon: dict[str, Any], strategy: str) -> str:
         stats = pokemon["stats"]
         atk = stats["attack"]
         spa = stats["sp_attack"]

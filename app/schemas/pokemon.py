@@ -1,4 +1,3 @@
-from typing import List, Optional, Dict
 from pydantic import BaseModel
 
 
@@ -15,7 +14,7 @@ class PokemonStats(BaseModel):
 class PokemonSummary(BaseModel):
     id: int
     name: str
-    types: List[str]
+    types: list[str]
     stats: PokemonStats
     sprite: str
     artwork: str
@@ -27,6 +26,6 @@ class TypeEffectiveness(BaseModel):
 
 
 class PokemonDetail(PokemonSummary):
-    weaknesses: List[TypeEffectiveness]
-    resistances: List[TypeEffectiveness]
-    immunities: List[str]
+    weaknesses: list[TypeEffectiveness]
+    resistances: list[TypeEffectiveness]
+    immunities: list[str]

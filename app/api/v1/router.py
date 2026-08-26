@@ -1,5 +1,6 @@
 from fastapi import APIRouter
-from app.api.v1.endpoints import pokemon, counter
+
+from app.api.v1.endpoints import counter, pokemon
 
 api_router = APIRouter()
 

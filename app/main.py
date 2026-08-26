@@ -4,16 +4,15 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 
-import app.models  # Importa modelos para que SQLAlchemy los reconozca
 from app.api.v1.router import api_router
 from app.core.config import settings
-from app.core.database import Base, engine
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Inicializar tablas de base de datos en el arranque (para SQLite / desarrollo)
-    Base.metadata.create_all(bind=engine)
+    # El esquema lo gestiona Alembic (`alembic upgrade head`), no la app.
+    # Crear tablas en el arranque escondia las migraciones faltantes hasta
+    # que aparecia una diferencia en produccion.
     yield
 
 

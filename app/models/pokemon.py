@@ -3,12 +3,16 @@
 from __future__ import annotations
 
 from datetime import datetime
+from typing import TYPE_CHECKING
 
 from sqlalchemy import CheckConstraint, DateTime, ForeignKey, Index, String, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
 from app.models.type import Type
+
+if TYPE_CHECKING:
+    from app.models.team import TeamMember
 
 
 class Pokemon(Base):
@@ -52,6 +56,8 @@ class Pokemon(Base):
         cascade="all, delete-orphan",
         order_by="PokemonType.slot",
     )
+    team_memberships: Mapped[list[TeamMember]] = relationship(back_populates="pokemon")
+
     @property
     def types(self) -> list[str]:
         """Nombres de tipo en orden de slot, la forma en que los consume el motor."""

@@ -24,8 +24,12 @@ class Settings(BaseSettings):
             return json.loads(v)
         return v
 
-    # Base de Datos
-    DATABASE_URL: str = "sqlite:///./monolito.db"
+    # Base de Datos - PostgreSQL 16 via psycopg 3.
+    # Coincide con el servicio `postgres` de docker-compose.yml.
+    DATABASE_URL: str = "postgresql+psycopg://pokemon:pokemon@localhost:5434/pokemon_counter"
+    # Volcado de SQL a consola. Separado de DEBUG: el reload del servidor no
+    # tiene por que implicar ruido de SQL en cada test.
+    SQL_ECHO: bool = False
 
     # Servidor
     HOST: str = "127.0.0.1"

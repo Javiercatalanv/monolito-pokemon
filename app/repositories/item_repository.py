@@ -1,5 +1,5 @@
-from typing import List, Optional
 from sqlalchemy.orm import Session
+
 from app.models.item import Item
 from app.schemas.item import ItemCreate, ItemUpdate
 
@@ -8,10 +8,10 @@ class ItemRepository:
     def __init__(self, db: Session):
         self.db = db
 
-    def get_all(self, skip: int = 0, limit: int = 100) -> List[Item]:
+    def get_all(self, skip: int = 0, limit: int = 100) -> list[Item]:
         return self.db.query(Item).offset(skip).limit(limit).all()
 
-    def get_by_id(self, item_id: int) -> Optional[Item]:
+    def get_by_id(self, item_id: int) -> Item | None:
         return self.db.query(Item).filter(Item.id == item_id).first()
 
     def create(self, item_in: ItemCreate) -> Item:

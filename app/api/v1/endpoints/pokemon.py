@@ -1,18 +1,18 @@
-from typing import List, Optional
 from fastapi import APIRouter, HTTPException, Query, status
+
 from app.core.pokemon_repository import pokemon_repo
-from app.core.type_chart import get_defensive_profile, TYPE_COLORS, POKEMON_TYPES
-from app.schemas.pokemon import PokemonSummary, PokemonDetail, TypeEffectiveness
+from app.core.type_chart import POKEMON_TYPES, TYPE_COLORS, get_defensive_profile
+from app.schemas.pokemon import PokemonDetail, PokemonSummary
 
 router = APIRouter()
 
 
-@router.get("", response_model=List[PokemonSummary], summary="Buscar y listar Pokémon")
+@router.get("", response_model=list[PokemonSummary], summary="Buscar y listar Pokémon")
 def list_pokemon(
-    query: Optional[str] = Query(None, description="Búsqueda por nombre o ID"),
-    type: Optional[str] = Query(None, description="Filtrar por tipo (fire, water, dragon...)"),
+    query: str | None = Query(None, description="Búsqueda por nombre o ID"),
+    type: str | None = Query(None, description="Filtrar por tipo (fire, water, dragon...)"),
     limit: int = Query(50, ge=1, le=200),
-    skip: int = Query(0, ge=0)
+    skip: int = Query(0, ge=0),
 ):
     """
     Retorna la lista de Pokémon con soporte para búsqueda en tiempo real y filtrado por tipo.
@@ -28,7 +28,11 @@ def get_types():
     return [{"name": t, "color": TYPE_COLORS[t]} for t in POKEMON_TYPES]
 
 
-@router.get("/{id_or_name}", response_model=PokemonDetail, summary="Detalle de un Pokémon con sus debilidades")
+@router.get(
+    "/{id_or_name}",
+    response_model=PokemonDetail,
+    summary="Detalle de un Pokémon con sus debilidades",
+)
 def get_pokemon_detail(id_or_name: str):
     """
     Retorna el detalle completo de un Pokémon incluyendo cálculo de debilidades y resistencias.
@@ -58,5 +62,5 @@ def get_pokemon_detail(id_or_name: str):
         **p,
         "weaknesses": sorted(weaknesses, key=lambda x: x["multiplier"], reverse=True),
         "resistances": sorted(resistances, key=lambda x: x["multiplier"]),
-        "immunities": immunities
+        "immunities": immunities,
     }

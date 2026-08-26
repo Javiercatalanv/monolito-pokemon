@@ -8,6 +8,14 @@ __pycache__/
 *.db
 *.sqlite3
 
+# Testing / cobertura
+.pytest_cache/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+.ruff_cache/
+
 # IDEs
 .vscode/
 .idea/
